@@ -1,9 +1,14 @@
+provider "aws" {
+  region = var.region
+  profile = var.profile
+}
+
 resource "aws_eks_cluster" "cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.role.arn
 
   vpc_config {
-    subnet_ids = data.aws_subnet_ids.private.ids
+    subnet_ids = local.eks_subnets
   }
 
   version = var.cluster_version
@@ -15,7 +20,6 @@ resource "aws_eks_cluster" "cluster" {
   ]
 
   tags = var.tags
-
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.AmazonEKSServicePolicy,
