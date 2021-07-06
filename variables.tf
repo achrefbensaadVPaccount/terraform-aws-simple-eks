@@ -59,3 +59,38 @@ variable "private_subnets" {
 variable "allow_public_private_subnets" {
   default = false
 }
+
+variable "worker_desired_size" {
+  type        = number
+  default     = 3
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+variable "worker_max_size" {
+  type        = number
+  default     = 5
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+
+variable "worker_min_size" {
+  type        = number
+  default     = 3
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+
+variable "cluster_autoscaler" {
+  type        = bool
+  default     = true
+  description = "Should this group be managed by the cluster autoscaler"
+}
+
+variable "root_volume_size" {
+  type        = number
+  default     = 100
+  description = "Volume size for the root partition"
+}
+
+variable "instance_size" {
+  type        = string
+  default     = "m5.large"
+  description = "The size of instances in this node group"
+}
