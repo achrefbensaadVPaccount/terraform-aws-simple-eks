@@ -1,6 +1,6 @@
 locals {
   worker-mng-name = "${var.cluster_name}-mng-worker-${random_string.worker-mng-name.result}"
- }
+}
 
 resource "random_string" "worker-mng-name" {
   length  = 4
@@ -11,16 +11,16 @@ resource "random_string" "worker-mng-name" {
 }
 
 resource "aws_eks_node_group" "worker-node-group" {
-  cluster_name    = var.cluster_name
-  node_group_name = local.worker-mng-name
-  node_role_arn   = aws_iam_role.worker_role.arn
-  subnet_ids      = local.private
-  capacity_type = "SPOT"
+  cluster_name         = var.cluster_name
+  node_group_name      = local.worker-mng-name
+  node_role_arn        = aws_iam_role.worker_role.arn
+  subnet_ids           = local.private
+  capacity_type        = "SPOT"
   force_update_version = false
 
   launch_template {
-   name = aws_launch_template.bottlerocket_lt.name
-   version = aws_launch_template.bottlerocket_lt.latest_version
+    name    = aws_launch_template.bottlerocket_lt.name
+    version = aws_launch_template.bottlerocket_lt.latest_version
   }
 
   scaling_config {
@@ -30,7 +30,7 @@ resource "aws_eks_node_group" "worker-node-group" {
   }
 
   depends_on = [aws_launch_template.bottlerocket_lt,
-             aws_eks_cluster.cluster,
+    aws_eks_cluster.cluster,
   ]
   lifecycle {
     create_before_destroy = true
@@ -39,11 +39,11 @@ resource "aws_eks_node_group" "worker-node-group" {
 
 
 locals {
- instance_profile_arn = aws_iam_role.worker_role
- root_device_mappings = tolist(data.aws_ami.bottlerocket_image.block_device_mappings)[0]
- autoscaler_tags      = var.cluster_autoscaler ? { "k8s.io/cluster-autoscaler/enabled" = "true", "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned" } : {}
- bottlerocket_tags    = { "Name" = "eks-node-aws_eks_cluster.cluster.name" }
- tags                 = merge(var.tags, { "kubernetes.io/cluster/${var.cluster_name}" = "owned"}, local.autoscaler_tags, local.bottlerocket_tags)
+  instance_profile_arn = aws_iam_role.worker_role
+  root_device_mappings = tolist(data.aws_ami.bottlerocket_image.block_device_mappings)[0]
+  autoscaler_tags      = var.cluster_autoscaler ? { "k8s.io/cluster-autoscaler/enabled" = "true", "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned" } : {}
+  bottlerocket_tags    = { "Name" = "eks-node-aws_eks_cluster.cluster.name" }
+  tags                 = merge(var.tags, { "kubernetes.io/cluster/${var.cluster_name}" = "owned" }, local.autoscaler_tags, local.bottlerocket_tags)
 }
 
 
@@ -96,14 +96,14 @@ resource "aws_launch_template" "bottlerocket_lt" {
     delete_on_termination       = true
   }
 
-   image_id      = data.aws_ami.bottlerocket_image.id 
-   user_data     = base64encode(data.template_file.bottlerocket_config.rendered)
+  image_id  = data.aws_ami.bottlerocket_image.id
+  user_data = base64encode(data.template_file.bottlerocket_config.rendered)
 
- tag_specifications {
+  tag_specifications {
     resource_type = "instance"
     tags          = local.tags
   }
- 
+
   tag_specifications {
     resource_type = "volume"
     tags          = local.tags

@@ -7,7 +7,7 @@ locals {
   public      = var.cascading_subnets ? var.public_subnets : local.public_subnets_ids
   private     = var.cascading_subnets ? var.private_subnets : local.private_subnets_ids
   eks_subnets = var.allow_public_private_subnets ? setunion(local.public, local.private) : local.private
-  
+
   # Log group name
   log_group_name = var.log_group_name == null ? var.cluster_name : var.log_group_name
 }
