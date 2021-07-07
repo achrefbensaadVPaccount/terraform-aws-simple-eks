@@ -18,10 +18,11 @@ variable "log_group_name" {
 }
 
 variable "cluster_version" {
-  type = string
+  type    = string
+  default = "1.20"
 }
 
-variable "vpc_name" {
+variable "vpc_id" {
   type = string
 }
 
@@ -33,4 +34,63 @@ variable "tags" {
 variable "use_calico_cni" {
   type    = bool
   default = false
+}
+
+# Dont tags subnets unless needed
+# To avoid unwanted shared ressources tags mutation
+variable "tag_subnets" {
+  default = false
+}
+
+# Allow subnets specification from cascading parent modules
+variable "cascading_subnets" {
+  default = false
+}
+
+variable "public_subnets" {
+  default = []
+}
+
+variable "private_subnets" {
+  default = []
+}
+
+# Allow the use of both public and private subnets for the cluster
+variable "allow_public_private_subnets" {
+  default = false
+}
+
+variable "worker_desired_size" {
+  type        = number
+  default     = 3
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+variable "worker_max_size" {
+  type        = number
+  default     = 5
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+
+variable "worker_min_size" {
+  type        = number
+  default     = 3
+  description = "The minimum number of instances that will be launched by this group, if not a multiple of the number of AZs in the group, may be rounded up"
+}
+
+variable "cluster_autoscaler" {
+  type        = bool
+  default     = true
+  description = "Should this group be managed by the cluster autoscaler"
+}
+
+variable "root_volume_size" {
+  type        = number
+  default     = 100
+  description = "Volume size for the root partition"
+}
+
+variable "instance_size" {
+  type        = string
+  default     = "m5.large"
+  description = "The size of instances in this node group"
 }

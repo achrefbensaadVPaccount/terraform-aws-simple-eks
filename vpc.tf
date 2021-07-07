@@ -1,34 +1,36 @@
+# Not every VPC have a name
+# Using VPC id will be more convenient 
 data "aws_vpc" "eks_vpc" {
-  tags = {
-    Name = var.vpc_name
-  }
+  id = var.vpc_id
 }
 
-data "aws_subnet_ids" "public" {
-  vpc_id = data.aws_vpc.eks_vpc.id
-
-  tags = {
-    Type = "Public"
-  }
+# Get all subnets and their ids
+data "aws_subnet_ids" "all_subnets_ids" {
+  vpc_id = var.vpc_id
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.eks_vpc.id
 
-  tags = {
-    Type = "Private"
-  }
+data "aws_subnet" "all_subnets" {
+  for_each = data.aws_subnet_ids.all_subnets_ids.ids
+  id       = each.value
+  depends_on = [
+    data.aws_vpc.eks_vpc,
+    data.aws_subnet_ids.all_subnets_ids
+  ]
 }
 
 # TODO: use aws_ec2_tag instead of kubectl
 
 resource "null_resource" "tag_subnets" {
   triggers = {
-    subnet_ids   = join(" ", setunion(data.aws_subnet_ids.public.ids, data.aws_subnet_ids.private.ids))
+    subnet_ids   = join(" ", setunion(local.private, local.public))
     cluster_name = var.cluster_name
     region       = var.region
     profile      = var.profile
   }
+
+  # To avoid unwanted shared ressources tags mutation
+  count = var.tag_subnets ? 1 : 0
 
   provisioner "local-exec" {
     command = <<-EOT

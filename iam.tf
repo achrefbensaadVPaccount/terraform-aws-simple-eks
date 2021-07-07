@@ -13,6 +13,7 @@ resource "aws_iam_role" "role" {
       }
     ]
   })
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
@@ -38,6 +39,7 @@ resource "aws_iam_role" "worker_role" {
     }]
     Version = "2012-10-17"
   })
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
@@ -86,4 +88,5 @@ resource "aws_iam_role_policy" "modify_instance_attributes" {
       }
     ]
   })
+
 }
