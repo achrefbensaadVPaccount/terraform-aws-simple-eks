@@ -6,13 +6,17 @@ data "aws_vpc" "eks_vpc" {
 
 # Get all subnets and their ids
 data "aws_subnet_ids" "all_subnets_ids" {
-  vpc_id = data.aws_vpc.eks_vpc.id
+  vpc_id = var.vpc_id
 }
 
 
 data "aws_subnet" "all_subnets" {
   for_each = data.aws_subnet_ids.all_subnets_ids.ids
   id       = each.value
+  depends_on = [
+    data.aws_vpc.eks_vpc,
+    data.aws_subnet_ids.all_subnets_ids
+  ]
 }
 
 # TODO: use aws_ec2_tag instead of kubectl
